@@ -6,7 +6,7 @@ const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const STATE = require('./state/index')
 
-const NODE_ENV = STATE.prod;
+const NODE_ENV = STATE.dev;
 require('dotenv').config({
     path: `environments/.env.${NODE_ENV}`
 });
@@ -16,7 +16,7 @@ const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         // headless: false, 
-        executablePath: '/usr/bin/google-chrome-stable',
+        executablePath: process.env.DIRECTORYCROME,
     }
 });
 
