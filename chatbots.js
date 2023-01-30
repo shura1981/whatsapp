@@ -1,24 +1,40 @@
 const { repplyMessage, getDate, getTime, pause, writeMessagesPoll, removeEmojis } = require("./utils");
 const { List, Buttons, MessageMedia } = require('whatsapp-web.js');
+ 
+const fs = require('fs');
+const path = require('path');
 // chatbots
 const chatbot_Prueba1 = (msg) => {
+    if (!(msg._data.quotedMsg.list.description.includes("¿Te gustaría Calificar la atención al cliente?"))) {
+        return null;
+    }
+    const { body, _data, from, to, deviceType, ack, fromMe, hasMedia, type } = msg;
+    let response = null;
     try {
-        const { body, type, _data } = msg;
-        if (body.includes('Bueno') && type === 'list_response') {
+        console.log({ title_list: msg._data.quotedMsg.list.title, title_description: msg._data.quotedMsg.list.description });
+        console.log({ title_response: msg._data.listResponse.title, title_description: msg._data.listResponse.description });
+        response = msg._data.listResponse.description;
+        console.log(response, from, to, deviceType, ack, fromMe, hasMedia, type);
+        if (response.includes('No me gustó') && type === 'list_response') {
             repplyMessage(msg, `Gracias *${_data.notifyName}* \nTu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
         }
-        else if (body.includes('Pobre') && type === 'list_response') {
+        else if (response.includes('Pobre') && type === 'list_response') {
             repplyMessage(msg, `Gracias *${_data.notifyName}* \nEs claro que ese mensajero no cumple con nuestra atención al cliente`);
         }
-        else if (body.includes('Adecuado') && type === 'list_response') {
+        else if (response.includes('Regular') && type === 'list_response') {
             repplyMessage(msg, `Gracias *${_data.notifyName}* \nVemos que no quedaste muy satisfecho con el servicio.`);
         }
-        else if (body.includes('Excelente') && type === 'list_response') {
+        else if (response.includes('Bueno') && type === 'list_response') {
+            repplyMessage(msg, `Gracias *${_data.notifyName}* \nLe daremos comisión al mensajero`);
+        }
+        else if (response.includes('Excelente') && type === 'list_response') {
             repplyMessage(msg, `Gracias *${_data.notifyName}* \nLe daremos comisión al mensajero`);
         }
     } catch (error) {
         console.log(error.message);
     }
+
+
 }
 const chatbot_Prueba2 = (msg) => {
     try {
@@ -286,7 +302,7 @@ const chatbot = async (msg, client) => {
 }
 
 // flujos chatbots-lista de respuestas
-const dialogFlow_bot4 = async (msg) => {
+const dialogFlow_bot4 = async (msg, client) => {
     if (msg._data.quotedMsg.list.title === chatbot_Prueba4.title) {
         const question = msg._data.quotedMsg.list.description.split(',')[0];
         let list = null;

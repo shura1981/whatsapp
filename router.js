@@ -2,48 +2,71 @@ const express = require('express');
 const router = express.Router();
 const { chatbot_Prueba4 } = require("./chatbots");
 const { List, Buttons, MessageMedia } = require('whatsapp-web.js');
+const { getName } = require("./utils.js");
 const fs = require('fs');
 
-module.exports = ( client ) => {
+
+module.exports = (client) => {
 
     router.get('/chats', async (req, res) => {
-        const resWs = await client.getChats();
-        let mensajes_verificar = await resWs[0].fetchMessages();
-        res.status(200).send({ mensajes_verificar, resWs });
+        try {
+            const { number } = req.query;
+            const resWs = await client.getChats();
+            let mensajes = await resWs.find(r => r.id.user == number).fetchMessages();
+            res.status(200).send(mensajes.reverse());
+        } catch (error) {
+            res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
+        }
     })
     //check number
     router.get('/checknumber', async (req, res) => {
-        const { number } = req.query;
-        const resWs = await client.isRegisteredUser(number)
-        res.status(200).send({ exists: resWs });
+        try {
+            const { number } = req.query;
+            const resWs = await client.isRegisteredUser(number)
+            res.status(200).send({ exists: resWs });
+        } catch (error) {
+            res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
+        }
     })
     // encuentas
     router.get('/encuesta1', async (req, res) => {
-        const { to } = req.query;
-
-        let sections = [{ title: 'Nutramerican', rows: [{ title: '🥰', description: 'Excelente' }, { title: '😍', description: 'Bueno' }, { title: '☺️', description: 'Adecuado' }, { title: '😢', description: 'Pobre' }] }];
-        let list = new List('¿Deseas Calificar el servicio del mensajero?', 'Calificar', sections, 'Nutramerican', 'nutramerican.com');
-        const number = `${to}@c.us`;
-        const resWs = await client.sendMessage(number, list);
-        res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+        const { to, mensajero, cliente } = req.query;
+        try {
+            let sections = [{ title: '', rows: [{ title: '😠', description: 'No me gustó' }, { title: '😔', description: 'Pobre' }, { title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
+            let list = new List(`Hola *${getName(cliente)}* ¿Te gustaría Calificar la atención al cliente?\n😠 😔 😐 😃 🤩`, 'Calificar', sections, 'Megaplex', 'nutramerican.com');
+            const number = `${to}@c.us`;
+            const resWs = await client.sendMessage(number, list);
+            await client.sendMessage(number, `¿Qué tal estuvo la entrega del conductor *${mensajero}*?`)
+            res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+        } catch (error) {
+            res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
+        }
     })
+
     router.get('/encuesta2', async (req, res) => {
         const { to } = req.query;
-
-        let sections = [{ title: 'Quiz de Steven', rows: [{ title: '🐷', description: 'Marrano' }, { title: '🐖', description: 'Gordito' }, { title: '🐽', description: 'Porcino' }] }];
-        let list = new List('Por favor califica que tan gordo está aramburo', 'Calificar', sections, 'Quiz de Steven', 'nutramerican.com');
-        const number = `${to}@c.us`;
-        const resWs = await client.sendMessage(number, list);
-
-
-        res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+        try {
+            let sections = [{ title: 'Quiz de Steven', rows: [{ title: '🐷', description: 'Marrano' }, { title: '🐖', description: 'Gordito' }, { title: '🐽', description: 'Porcino' }] }];
+            let list = new List('Por favor califica que tan gordo está aramburo', 'Calificar', sections, 'Quiz de Steven', 'nutramerican.com');
+            const number = `${to}@c.us`;
+            const resWs = await client.sendMessage(number, list);
+            res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+        } catch (error) {
+            res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
+        }
     })
+
+
     router.get('/encuesta3', async (req, res) => {
-        const { to } = req.query;
-        const list = chatbot_Prueba4.question1();
-        const number = `${to}@c.us`;
-        const resWs = await client.sendMessage(number, list);
-        res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+        try {
+            const { to } = req.query;
+            const list = chatbot_Prueba4.question1();
+            const number = `${to}@c.us`;
+            const resWs = await client.sendMessage(number, list);
+            res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+        } catch (error) {
+            res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
+        }
     });
     // nombres de archivos para /file
     router.get('/filesname', async (req, res) => {

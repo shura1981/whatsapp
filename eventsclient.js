@@ -35,14 +35,15 @@ module.exports = (client) => {
         // console.log('MESSAGE RECEIVED',JSON.stringify(msg));
         writeMessages({ mensaje: body, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
         chatbot(msg, client);
-        chatbot_Prueba1(msg);
+       
         chatbot_Prueba2(msg);
 
         // recibe las respuestas de las listas enviadas
         if (msg.hasQuotedMsg && type === 'list_response') {
             // console.log({ description_response: msg._data.listResponse.description, title_response: msg._data.listResponse.title });
             // console.log({ title_question: msg._data.quotedMsg.list.title, description_question: msg._data.quotedMsg.list.description });
-            dialogFlow_bot4(msg);
+            dialogFlow_bot4(msg, client);
+            chatbot_Prueba1(msg);
         }
 
     });
