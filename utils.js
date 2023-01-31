@@ -1,5 +1,5 @@
 const fs = require('fs');
-
+const fetch = require('node-fetch');
 /**
  * Constesta una respuesta (texto) a nuestro cliente
  * @param {*} msg objecto mensaje
@@ -82,7 +82,42 @@ const removeEmojis = (string) => {
     return string.replace(regex, '');
 }
 const getName = (user) => user.split(" ")[0]
+const fetchPost = (url, body) => {
+    const options = {
+        method: 'post',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' }
+    }
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const { status, ok } = response;
+                const msg = await response.json()
+                reject({ status, ok, msg });
+            }
+            const json = await response.json();
+            resolve(json);
+        } catch (error) {
+            reject(error.message);
+        }
+    });
+}
+const sendNotification = async (payload, response) => {
+    try {
+        const { poll, question, desde, para, fecha, hora, name } = payload;
+        const json = {
+            fecha: fecha,
+            celular: Number(desde.split("57")[1]),
+            calificacion: { poll, question, response, desde, para, fecha, hora, name }
+        }
+        const res = await fetchPost('https://www.elitenutritiongroup.com/api_eliteN/api/webservicev2.php/calificarmensajeros', json);
+        console.log("respuesta", res);
+    } catch (error) {
+        console.log("ocurrió un error", error);
+    }
+}
 
 module.exports = {
-    repplyMessage, getDate, getTime, pause, writeMessages, writeMessagesPoll, removeEmojis, getName
+    repplyMessage, getDate, getTime, pause, writeMessages, writeMessagesPoll, removeEmojis, getName, fetchPost, sendNotification
 }

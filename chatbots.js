@@ -1,40 +1,40 @@
-const { repplyMessage, getDate, getTime, pause, writeMessagesPoll, removeEmojis } = require("./utils");
+const { repplyMessage, getDate, getTime, pause, writeMessagesPoll, removeEmojis, sendNotification } = require("./utils");
 const { List, Buttons, MessageMedia } = require('whatsapp-web.js');
- 
 const fs = require('fs');
 const path = require('path');
+
+
+
 // chatbots
-const chatbot_Prueba1 = (msg) => {
+const chatbot_Prueba1 = async (msg) => {
     if (!(msg._data.quotedMsg.list.description.includes("¿Te gustaría Calificar la atención al cliente?"))) {
         return null;
     }
-    const { body, _data, from, to, deviceType, ack, fromMe, hasMedia, type } = msg;
-    let response = null;
+    const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+    let response = _data.listResponse.description;
     try {
-        console.log({ title_list: msg._data.quotedMsg.list.title, title_description: msg._data.quotedMsg.list.description });
-        console.log({ title_response: msg._data.listResponse.title, title_description: msg._data.listResponse.description });
-        response = msg._data.listResponse.description;
-        console.log(response, from, to, deviceType, ack, fromMe, hasMedia, type);
+        const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
+        writeMessagesPoll(payload);
+        await sendNotification(payload, response);
+
         if (response.includes('No me gustó') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nTu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
+            repplyMessage(msg, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
         }
         else if (response.includes('Pobre') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nEs claro que ese mensajero no cumple con nuestra atención al cliente`);
+            repplyMessage(msg, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
         }
         else if (response.includes('Regular') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nVemos que no quedaste muy satisfecho con el servicio.`);
+            repplyMessage(msg, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
         }
         else if (response.includes('Bueno') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nLe daremos comisión al mensajero`);
+            repplyMessage(msg, `Gracias por tu comentario.`);
         }
         else if (response.includes('Excelente') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nLe daremos comisión al mensajero`);
+            repplyMessage(msg, `Gracias por tu comentario.`);
         }
     } catch (error) {
         console.log(error.message);
     }
-
-
 }
 const chatbot_Prueba2 = (msg) => {
     try {
@@ -307,8 +307,9 @@ const dialogFlow_bot4 = async (msg, client) => {
         const question = msg._data.quotedMsg.list.description.split(',')[0];
         let list = null;
         let response = null;
-        const { body, _data, from, to, deviceType, ack, fromMe, hasMedia, type } = msg;
-        // console.log({ description_response: msg._data.listResponse.description, title_response: msg._data.listResponse.title });
+        const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+        // console.log({ title_list: msg._data.quotedMsg.list.title, title_description: msg._data.quotedMsg.list.description });
+        // console.log({ title_response: msg._data.listResponse.title, title_description: msg._data.listResponse.description });
         switch (question) {
             case 'Pregunta 1':
                 response = removeEmojis(msg._data.listResponse.title);
