@@ -32,11 +32,14 @@ module.exports = (client) => {
     router.get('/encuesta1', async (req, res) => {
         const { to, mensajero, cliente } = req.query;
         try {
-            let sections = [{ title: '', rows: [{ title: '😠', description: 'No me gustó' }, { title: '😔', description: 'Pobre' }, { title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
-            let list = new List(`Hola *${getName(cliente)}* ¿Te gustaría Calificar la atención al cliente?\n😠 😔 😐 😃 🤩`, 'Calificar', sections, 'Megaplex', 'nutramerican.com');
-            const number = `${to}@c.us`;
-            const resWs = await client.sendMessage(number, list);
-            await client.sendMessage(number, `¿Qué tal estuvo la entrega del conductor *${mensajero}*?`)
+            let sections = [{ title: '', rows: [{ title: '😠', description: 'No me gustó' }, { title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
+            let list = new List(`Hola *${getName(cliente)}* Te escribimos de MEGAPLEX ¿Te gustaría Calificar la atención al cliente?\n😠 😐 😃 🤩`, 'Calificar', sections, 'Megaplex', 'nutramerican.com');
+           
+           
+            let button = new Buttons(`\n¿Qué tal estuvo la entrega de nuestro especialista en logística *${mensajero}*?`, [{ body: '😐 Regular' }, { body: '😃 Bueno' }, { body: '🤩 Excelente' }], `Hola ${getName(cliente)}. Te escribimos de MEGAPLEX. ¿Te gustaría Calificar la atención al cliente?\n 😐 😃 🤩`, 'nutramerican pharma');
+                   const number = `${to}@c.us`;
+            const resWs = await client.sendMessage(number, button);
+            // await client.sendMessage(number, `¿Qué tal estuvo la entrega del conductor *${mensajero}*?`)
             res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
         } catch (error) {
             res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });

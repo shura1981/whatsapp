@@ -118,6 +118,12 @@ const sendNotification = async (payload, response) => {
     }
 }
 
+const responseButtons={
+    '0': 'REGULAR',
+    '1':  'BUENO',
+    '2': 'EXCELENTE'
+}
+
 module.exports = {
-    repplyMessage, getDate, getTime, pause, writeMessages, writeMessagesPoll, removeEmojis, getName, fetchPost, sendNotification
+    repplyMessage, getDate, getTime, pause, writeMessages, writeMessagesPoll, removeEmojis, getName, fetchPost, sendNotification, responseButtons
 }

@@ -1,4 +1,4 @@
-const { repplyMessage, getDate, getTime, pause, writeMessagesPoll, removeEmojis, sendNotification } = require("./utils");
+const { repplyMessage, getDate, getTime, pause, writeMessagesPoll, removeEmojis, sendNotification, responseButtons } = require("./utils");
 const { List, Buttons, MessageMedia } = require('whatsapp-web.js');
 const fs = require('fs');
 const path = require('path');
@@ -31,6 +31,32 @@ const chatbot_Prueba1 = async (msg) => {
         }
         else if (response.includes('Excelente') && type === 'list_response') {
             repplyMessage(msg, `Gracias por tu comentario.`);
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const chatbot_Prueba5 = async (msg, client) => {
+    if (!(msg._data.quotedMsg.body.includes("Qué tal estuvo la entrega del conductor"))) {
+        return null;
+    }
+
+
+    const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+    let response = responseButtons[msg.selectedButtonId];
+    try {
+        const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
+        writeMessagesPoll(payload);
+        await sendNotification(payload, response);
+
+        if (response.includes('REGULAR') && type === 'buttons_response') {
+            client.sendMessage(from, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
+        }
+        else if (response.includes('BUENO') && type === 'buttons_response') {
+            client.sendMessage(from, `Gracias por tu comentario.`);
+        }
+        else if (response.includes('EXCELENTE') && type === 'buttons_response') {
+            client.sendMessage(from, `Gracias por tu comentario.`);
         }
     } catch (error) {
         console.log(error.message);
@@ -362,5 +388,5 @@ const dialogFlow_bot4 = async (msg, client) => {
 }
 
 module.exports = {
-    chatbot_Prueba1, chatbot_Prueba2, chatbot_Prueba4, chatbot, dialogFlow_bot4
+    chatbot_Prueba1, chatbot_Prueba2, chatbot_Prueba4, chatbot, dialogFlow_bot4, chatbot_Prueba5
 }

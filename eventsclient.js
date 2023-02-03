@@ -1,5 +1,5 @@
 
-const { chatbot_Prueba1, chatbot_Prueba2, chatbot, dialogFlow_bot4 } = require("./chatbots");
+const { chatbot_Prueba1, chatbot_Prueba2, chatbot, dialogFlow_bot4, chatbot_Prueba5 } = require("./chatbots");
 const { getDate, getTime, writeMessages } = require("./utils");
 const qrcode = require('qrcode-terminal');
 module.exports = (client) => {
@@ -35,9 +35,13 @@ module.exports = (client) => {
         // console.log('MESSAGE RECEIVED',JSON.stringify(msg));
         writeMessages({ mensaje: body, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
         chatbot(msg, client);
-       
+
         chatbot_Prueba2(msg);
 
+        if (msg.hasQuotedMsg && type === 'buttons_response') {
+            chatbot_Prueba5(msg, client);
+
+        }
         // recibe las respuestas de las listas enviadas
         if (msg.hasQuotedMsg && type === 'list_response') {
             // console.log({ description_response: msg._data.listResponse.description, title_response: msg._data.listResponse.title });
