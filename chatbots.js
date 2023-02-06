@@ -37,7 +37,7 @@ const chatbot_Prueba1 = async (msg) => {
     }
 }
 const chatbot_Prueba5 = async (msg, client) => {
-    if (!(msg._data.quotedMsg.body.toLocaleLowerCase.includes("qué tal estuvo la entrega de nuestro especialista en logística"))) {
+    if (!(msg._data.quotedMsg.body.toLocaleLowerCase().includes("qué tal estuvo la entrega de nuestro especialista en logística"))) {
         return null;
     }
 
