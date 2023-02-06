@@ -37,12 +37,11 @@ const chatbot_Prueba1 = async (msg) => {
     }
 }
 const chatbot_Prueba5 = async (msg, client) => {
-    if (!(msg._data.quotedMsg.body.includes("Qué tal estuvo la entrega del conductor"))) {
+    if (!(msg._data.quotedMsg.body.toLocaleLowerCase.includes("qué tal estuvo la entrega de nuestro especialista en logística"))) {
         return null;
     }
 
-
-    const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
     let response = responseButtons[msg.selectedButtonId];
     try {
         const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
