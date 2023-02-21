@@ -4,128 +4,14 @@ const fs = require('fs');
 const path = require('path');
 
 
+const optionResponse = {
+    regular: `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.\nSi tienes alguna queja o reclamo no dudes en escribirnos.`,
+    bueno: `Gracias por tu comentario. Si tienes alguna sugerencia no dudes en escribirnos`,
+    excelente: `Gracias por tu comentario.`
+}
+
 
 // chatbots
-const chatbot_Prueba1 = async (msg) => {
-    if (!(msg._data.quotedMsg.list.description.includes("¿Te gustaría Calificar la atención al cliente?"))) {
-        return null;
-    }
-    const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
-    let response = _data.listResponse.description;
-    try {
-        const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
-        writeMessagesPoll(payload);
-        await sendNotification(payload, response);
-
-        if (response.includes('No me gustó') && type === 'list_response') {
-            repplyMessage(msg, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
-        }
-        else if (response.includes('Pobre') && type === 'list_response') {
-            repplyMessage(msg, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
-        }
-        else if (response.includes('Regular') && type === 'list_response') {
-            repplyMessage(msg, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
-        }
-        else if (response.includes('Bueno') && type === 'list_response') {
-            repplyMessage(msg, `Gracias por tu comentario.`);
-        }
-        else if (response.includes('Excelente') && type === 'list_response') {
-            repplyMessage(msg, `Gracias por tu comentario.`);
-        }
-    } catch (error) {
-        console.log(error.message);
-    }
-}
-const chatbot_Prueba5 = async (msg, client) => {
-    if (!(msg._data.quotedMsg.body.toLocaleLowerCase().includes("qué tal estuvo la entrega de nuestro especialista en logística"))) {
-        return null;
-    }
-
-const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
-    let response = responseButtons[msg.selectedButtonId];
-    try {
-        const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
-        writeMessagesPoll(payload);
-        await sendNotification(payload, response);
-
-        if (response.includes('REGULAR') && type === 'buttons_response') {
-            client.sendMessage(from, `Gracias por tu comentario. Tu respuesta se tomará en cuenta para mejorar nuestro servicio.`);
-        }
-        else if (response.includes('BUENO') && type === 'buttons_response') {
-            client.sendMessage(from, `Gracias por tu comentario.`);
-        }
-        else if (response.includes('EXCELENTE') && type === 'buttons_response') {
-            client.sendMessage(from, `Gracias por tu comentario.`);
-        }
-    } catch (error) {
-        console.log(error.message);
-    }
-}
-const chatbot_Prueba2 = (msg) => {
-    try {
-        const { body, type, _data } = msg;
-        if (body.includes('Porcino') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nPorcino, yo creo que está más gordo`);
-        }
-        else if (body.includes('Gordito') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nYo lo veo más gordo pero si tu dices que gordito por mí está bien.`);
-        }
-        else if (body.includes('Marrano') && type === 'list_response') {
-            repplyMessage(msg, `Gracias *${_data.notifyName}* \nLa verdad está muy marrano`);
-        }
-    } catch (error) {
-        console.log(error.message);
-    }
-}
-const chatbot_Prueba4 = {
-    title: 'Prueba de conocimiento',
-    question1: () => {
-        let sections = [
-            {
-                title: 'Selecciona la respuesta correcta.',
-                rows: [
-                    { title: '1️⃣Sinefrina', description: '' },
-                    { title: '2️⃣Cafeína', description: '' },
-                    { title: '3️⃣Taurina', description: '' },
-                    { title: '4️⃣Citrulina', description: '' }
-                ]
-            }
-        ];
-        return new List('Pregunta 1, ¿Qué ingredientes no contiene Burner Stack? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, chatbot_Prueba4.title, 'nutramerican.com');
-    },
-    question2: () => {
-        let sections = [
-            {
-                title: 'Selecciona la respuesta correcta.',
-                rows: [
-                    { title: '1️⃣', description: 'Fortalece el sistema inmunológico' },
-                    { title: '2️⃣', description: 'Estimula el gen M-tor para aumentar la síntesis de proteínas.' },
-                    { title: '3️⃣', description: 'Transporta los ácidos grasos al interior de la mitocondria' },
-                    { title: '4️⃣', description: 'Mejora la vasodilatación sanguínea' }
-                ]
-            }
-        ];
-        return new List('Pregunta 2, ¿Cuál es la función de la L-carnitina? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
-    },
-    question3: () => {
-        let sections = [
-            {
-                title: 'Selecciona la respuesta correcta.',
-                rows: [
-                    { title: '1️⃣', description: 'Extracto de té amargo' },
-                    { title: '2️⃣', description: 'Extracto de naranja dulce' },
-                    { title: '3️⃣', description: 'Extracto de naranja amarga' }
-                ]
-            }
-        ];
-        return new List('Pregunta 3, ¿Con qué nombre se le conoce a la sinefrina? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
-    },
-    responses: {
-        'Pregunta 1': 'Citrulina',
-        'Pregunta 2': 'Transporta los ácidos grasos al interior de la mitocondria',
-        'Pregunta 3': 'Extracto de naranja amarga',
-    }
-}
 const chatbot = async (msg, client) => {
     try {
         if (msg.body === 'video') {
@@ -325,7 +211,121 @@ const chatbot = async (msg, client) => {
     }
 
 }
+const chatbot_Prueba1 = async (msg) => {
+    if (!(msg._data.quotedMsg.list.description.includes("Cómo estuvo la entrega de nuestro especialista en logística"))) {
+        return null;
+    }
+    const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+    let response = _data.listResponse.description.toLocaleUpperCase();
 
+    try {
+        const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
+        writeMessagesPoll(payload);
+        await sendNotification(payload, response);
+
+        if (response.includes('REGULAR') && type === 'list_response') {
+            repplyMessage(msg, optionResponse.regular);
+        }
+        else if (response.includes('BUENO') && type === 'list_response') {
+            repplyMessage(msg, optionResponse.bueno);
+        }
+        else if (response.includes('EXCELENTE') && type === 'list_response') {
+            repplyMessage(msg, optionResponse.excelente);
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const chatbot_Prueba2 = (msg) => {
+    try {
+        const { body, type, _data } = msg;
+        if (body.includes('Porcino') && type === 'list_response') {
+            repplyMessage(msg, `Gracias *${_data.notifyName}* \nPorcino, yo creo que está más gordo`);
+        }
+        else if (body.includes('Gordito') && type === 'list_response') {
+            repplyMessage(msg, `Gracias *${_data.notifyName}* \nYo lo veo más gordo pero si tu dices que gordito por mí está bien.`);
+        }
+        else if (body.includes('Marrano') && type === 'list_response') {
+            repplyMessage(msg, `Gracias *${_data.notifyName}* \nLa verdad está muy marrano`);
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const chatbot_Prueba4 = {
+    title: 'Prueba de conocimiento',
+    question1: () => {
+        let sections = [
+            {
+                title: 'Selecciona la respuesta correcta.',
+                rows: [
+                    { title: '1️⃣Sinefrina', description: '' },
+                    { title: '2️⃣Cafeína', description: '' },
+                    { title: '3️⃣Taurina', description: '' },
+                    { title: '4️⃣Citrulina', description: '' }
+                ]
+            }
+        ];
+        return new List('Pregunta 1, ¿Qué ingredientes no contiene Burner Stack? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, chatbot_Prueba4.title, 'nutramerican.com');
+    },
+    question2: () => {
+        let sections = [
+            {
+                title: 'Selecciona la respuesta correcta.',
+                rows: [
+                    { title: '1️⃣', description: 'Fortalece el sistema inmunológico' },
+                    { title: '2️⃣', description: 'Estimula el gen M-tor para aumentar la síntesis de proteínas.' },
+                    { title: '3️⃣', description: 'Transporta los ácidos grasos al interior de la mitocondria' },
+                    { title: '4️⃣', description: 'Mejora la vasodilatación sanguínea' }
+                ]
+            }
+        ];
+        return new List('Pregunta 2, ¿Cuál es la función de la L-carnitina? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
+    },
+    question3: () => {
+        let sections = [
+            {
+                title: 'Selecciona la respuesta correcta.',
+                rows: [
+                    { title: '1️⃣', description: 'Extracto de té amargo' },
+                    { title: '2️⃣', description: 'Extracto de naranja dulce' },
+                    { title: '3️⃣', description: 'Extracto de naranja amarga' }
+                ]
+            }
+        ];
+        return new List('Pregunta 3, ¿Con qué nombre se le conoce a la sinefrina? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
+    },
+    responses: {
+        'Pregunta 1': 'Citrulina',
+        'Pregunta 2': 'Transporta los ácidos grasos al interior de la mitocondria',
+        'Pregunta 3': 'Extracto de naranja amarga',
+    }
+}
+const chatbot_Prueba5 = async (msg, client) => {
+    if (!(msg._data.quotedMsg.body.toLocaleLowerCase().includes("qué tal estuvo la entrega de nuestro especialista en logística"))) {
+        return null;
+    }
+
+    const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+    let response = responseButtons[msg.selectedButtonId];
+    try {
+        const payload = { poll: "atención al cliente de mensajeros", question: 'Qué tal estuvo la entrega', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type }
+        writeMessagesPoll(payload);
+        await sendNotification(payload, response);
+
+        if (response.includes('REGULAR') && type === 'buttons_response') {
+            client.sendMessage(from, optionResponse.regular);
+        }
+        else if (response.includes('BUENO') && type === 'buttons_response') {
+            client.sendMessage(from, optionResponse.bueno);
+        }
+        else if (response.includes('EXCELENTE') && type === 'buttons_response') {
+            client.sendMessage(from, optionResponse.excelente);
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 // flujos chatbots-lista de respuestas
 const dialogFlow_bot4 = async (msg, client) => {
     if (msg._data.quotedMsg.list.title === chatbot_Prueba4.title) {

@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { chatbot_Prueba4 } = require("./chatbots");
 const { List, Buttons, MessageMedia } = require('whatsapp-web.js');
-const { getName } = require("./utils.js");
+const { getName, pause } = require("./utils.js");
 const fs = require('fs');
-
+let optionsResponse = 0;
 
 module.exports = (client) => {
 
@@ -19,28 +19,34 @@ module.exports = (client) => {
         }
     })
     //check number
-    router.get('/checknumber', async (req, res) => {
-        try {
-            const { number } = req.query;
-            const resWs = await client.isRegisteredUser(number)
-            res.status(200).send({ exists: resWs });
-        } catch (error) {
-            res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
-        }
-    })
+    // router.get('/checknumber', async (req, res) => {
+    //     try {
+    //         const { number } = req.query;
+    //         const resWs = await client.isRegisteredUser(number)
+    //         res.status(200).send({ exists: resWs });
+    //     } catch (error) {
+    //         res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
+    //     }
+    // })
     // encuentas
     router.get('/encuesta1', async (req, res) => {
         const { to, mensajero, cliente } = req.query;
         try {
-            let sections = [{ title: '', rows: [{ title: '😠', description: 'No me gustó' }, { title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
-            let list = new List(`Hola *${getName(cliente)}* Te escribimos de MEGAPLEX ¿Te gustaría Calificar la atención al cliente?\n😠 😐 😃 🤩`, 'Calificar', sections, 'Megaplex', 'nutramerican.com');
-           
-           
-            let button = new Buttons(`\n¿Qué tal estuvo la entrega de nuestro especialista en logística *${mensajero}*?`, [{ body: '😐 Regular' }, { body: '😃 Bueno' }, { body: '🤩 Excelente' }], `Hola ${getName(cliente)}. Te escribimos de MEGAPLEX. ¿Te gustaría Calificar la atención al cliente?\n 😐 😃 🤩`, 'nutramerican pharma');
-                   const number = `${to}@c.us`;
-            const resWs = await client.sendMessage(number, button);
-            // await client.sendMessage(number, `¿Qué tal estuvo la entrega del conductor *${mensajero}*?`)
-            res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+            optionsResponse++;
+            if (optionsResponse > 1) optionsResponse = 0;
+            const number = `${to}@c.us`;
+            let poll = null;
+            if (optionsResponse === 0) {
+                let sections = [{ title: '', rows: [{ title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
+                poll = new List(`¿Cómo estuvo la entrega de nuestro especialista en logística *${mensajero}*?\n 😐 😃 🤩`, 'Calificar', sections, ``, 'nutramerican.com');
+                await client.sendMessage(number, `Buen día *${getName(cliente)}*. Te escribimos del call center de *MEGAPLEX*. Nos interesa su opinión sobre nuestro servicio de mensajería. \n¿Te gustaría calificar el servicio?`);
+            } else {
+                poll = new Buttons(`\n¿Qué tal estuvo la entrega de nuestro especialista en logística *${mensajero}*?`, [{ body: '😐 Regular' }, { body: '😃 Bueno' }, { body: '🤩 Excelente' }], `¿Te gustaría Calificar la atención al cliente?\n 😐 😃 🤩`, 'nutramerican pharma');
+                await client.sendMessage(number, `Hola *${getName(cliente)}*. Te escribimos de *MEGAPLEX*. Estamos interesados en mejorar nuestro servicio.`);
+            }
+            await pause(2000);
+            const resWs = await client.sendMessage(number, poll);
+            res.status(200).send(resWs);
         } catch (error) {
             res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
         }
@@ -84,13 +90,13 @@ module.exports = (client) => {
     router.get('/file', async (req, res) => {
         try {
             const { to, message, fileName } = req.query;
-            const valid = await client.isRegisteredUser(to);
-            if (valid) {
-                const number = `${to}@c.us`;
-                const media = MessageMedia.fromFilePath(`${process.env.URLDIRECTORYMEDIA}/${fileName}`);
-                const payload = await client.sendMessage(number, media, { caption: message.replace(/\\n/g, '\n') || null });
-                res.status(200).send({ msg: `envidado a ${to}`, payload });
-            } else res.status(404).send({ message: 'El número de celular no se encuentra disponible' });
+            // const valid = await client.isRegisteredUser(to);
+            // if (valid) {
+            const number = `${to}@c.us`;
+            const media = MessageMedia.fromFilePath(`${process.env.URLDIRECTORYMEDIA}/${fileName}`);
+            const payload = await client.sendMessage(number, media, { caption: message.replace(/\\n/g, '\n') || null });
+            res.status(200).send({ msg: `envidado a ${to}`, payload });
+            // } else res.status(404).send({ message: 'El número de celular no se encuentra disponible' });
         } catch (error) {
             res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
         }
@@ -99,13 +105,13 @@ module.exports = (client) => {
     router.get('/url', async (req, res) => {
         try {
             const { to, message, url } = req.query;
-            const valid = await client.isRegisteredUser(to);
-            if (valid) {
-                const number = `${to}@c.us`;
-                const media = await MessageMedia.fromUrl(url);
-                const r = await client.sendMessage(number, media, { caption: message.replace(/\\n/g, '\n') || null });
-                res.status(200).send({ msg: `envidado a ${to}`, payload: r });
-            } else res.status(404).send({ message: 'El número de celular no se encuentra disponible' });
+            // const valid = await client.isRegisteredUser(to);
+            // if (valid) {
+            const number = `${to}@c.us`;
+            const media = await MessageMedia.fromUrl(url);
+            const r = await client.sendMessage(number, media, { caption: message.replace(/\\n/g, '\n') || null });
+            res.status(200).send({ msg: `envidado a ${to}`, payload: r });
+            // } else res.status(404).send({ message: 'El número de celular no se encuentra disponible' });
         } catch (error) {
             res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
         }
@@ -114,12 +120,12 @@ module.exports = (client) => {
     router.get('/message', async (req, res) => {
         try {
             const { to, message } = req.query;
-            const valid = await client.isRegisteredUser(to);
-            if (valid) {
-                const number = `${to}@c.us`;
-                const resWs = await client.sendMessage(number, message.replace(/\\n/g, '\n'), { linkPreview: true });
-                res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
-            } else res.status(404).send({ message: 'El número de celular no se encuentra disponible' });
+            // const valid = await client.isRegisteredUser(to);
+            // if (valid) {
+            const number = `${to}@c.us`;
+            const resWs = await client.sendMessage(number, message.replace(/\\n/g, '\n'), { linkPreview: true });
+            res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
+            // } else res.status(404).send({ message: 'El número de celular no se encuentra disponible' });
         } catch (error) {
             res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
         }
