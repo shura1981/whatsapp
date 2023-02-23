@@ -259,46 +259,60 @@ const chatbot_Prueba4 = {
             {
                 title: 'Selecciona la respuesta correcta.',
                 rows: [
-                    { title: '1️⃣Sinefrina', description: '' },
-                    { title: '2️⃣Cafeína', description: '' },
-                    { title: '3️⃣Taurina', description: '' },
-                    { title: '4️⃣Citrulina', description: '' }
+                    { title: '1️⃣Triptófano, isoleucina y valina', description: '' },
+                    { title: '2️⃣Leucina, isoleucina y glutamina', description: '' },
+                    { title: '3️⃣Leucina, isoleucina y taurina', description: '' },
+                    { title: '4️⃣Leucina, isoleucina y valina', description: '' }
                 ]
             }
         ];
-        return new List('Pregunta 1, ¿Qué ingredientes no contiene Burner Stack? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, chatbot_Prueba4.title, 'nutramerican.com');
+        return new List('Pregunta 1, ¿Cuáles son los aminoácidos de cadena remificada? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, chatbot_Prueba4.title, 'nutramerican.com');
     },
     question2: () => {
         let sections = [
             {
                 title: 'Selecciona la respuesta correcta.',
                 rows: [
-                    { title: '1️⃣', description: 'Fortalece el sistema inmunológico' },
-                    { title: '2️⃣', description: 'Estimula el gen M-tor para aumentar la síntesis de proteínas.' },
-                    { title: '3️⃣', description: 'Transporta los ácidos grasos al interior de la mitocondria' },
-                    { title: '4️⃣', description: 'Mejora la vasodilatación sanguínea' }
+                    { title: '1️⃣', description: 'Taurina, arginina y glicina' },
+                    { title: '2️⃣', description: 'Metionina, arginina y lisina' },
+                    { title: '3️⃣', description: 'Metionina, arginina y glicina' },
+                    { title: '4️⃣', description: 'Metionina, arginina y fenilalanina' }
                 ]
             }
         ];
-        return new List('Pregunta 2, ¿Cuál es la función de la L-carnitina? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
+        return new List('Pregunta 2, Los aminoácidos que sintetizan la creatina son: Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
     },
     question3: () => {
         let sections = [
             {
                 title: 'Selecciona la respuesta correcta.',
                 rows: [
-                    { title: '1️⃣', description: 'Extracto de té amargo' },
-                    { title: '2️⃣', description: 'Extracto de naranja dulce' },
-                    { title: '3️⃣', description: 'Extracto de naranja amarga' }
+                    { title: '1️⃣', description: 'Durante el entreno' },
+                    { title: '2️⃣', description: 'Antes del entreno' },
+                    { title: '3️⃣', description: 'Después del entreno' }
                 ]
             }
         ];
-        return new List('Pregunta 3, ¿Con qué nombre se le conoce a la sinefrina? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
+        return new List('Pregunta 3, ¿Cuál es el mejor momento para tomar la proteína? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
+    },
+    question4: () => {
+        let sections = [
+            {
+                title: 'Selecciona la respuesta correcta.',
+                rows: [
+                    { title: '1️⃣', description: 'Si. Todos lo pueden tomar' },
+                    { title: '2️⃣', description: 'No. Solo clientes tengan problemas con el sistema nervioso' },
+                    { title: '3️⃣', description: 'No. Solo clientes tengan problemas con el azúcar' }
+                ]
+            }
+        ];
+        return new List('Pregunta 4, Las bebidas energéticas como burner stack, energy x o power stack, ¿Se recomiendan para todos los clientes? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, 'Prueba de conocimiento', 'nutramerican.com');
     },
     responses: {
-        'Pregunta 1': 'Citrulina',
-        'Pregunta 2': 'Transporta los ácidos grasos al interior de la mitocondria',
-        'Pregunta 3': 'Extracto de naranja amarga',
+        'Pregunta 1': 'Leucina, isoleucina y valina',
+        'Pregunta 2': 'Metionina, arginina y glicina',
+        'Pregunta 3': 'Después del entreno',
+        'Pregunta 4': 'No. Solo clientes tengan problemas con el sistema nervioso',
     }
 }
 const chatbot_Prueba5 = async (msg, client) => {
@@ -328,61 +342,79 @@ const chatbot_Prueba5 = async (msg, client) => {
 }
 // flujos chatbots-lista de respuestas
 const dialogFlow_bot4 = async (msg, client) => {
-    if (msg._data.quotedMsg.list.title === chatbot_Prueba4.title) {
-        const question = msg._data.quotedMsg.list.description.split(',')[0];
-        let list = null;
-        let response = null;
-        const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
-        // console.log({ title_list: msg._data.quotedMsg.list.title, title_description: msg._data.quotedMsg.list.description });
-        // console.log({ title_response: msg._data.listResponse.title, title_description: msg._data.listResponse.description });
-        switch (question) {
-            case 'Pregunta 1':
-                response = removeEmojis(msg._data.listResponse.title);
-                writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 1', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
-                console.log("respuesta 1: ", response);
-                list = chatbot_Prueba4.question2();
-                await pause(2000);
-                await client.sendMessage(msg.from, list);
-                break;
-            case 'Pregunta 2':
-                response = msg._data.listResponse.description;
-                writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 2', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
-                console.log("respuesta 2: ", response);
-                list = chatbot_Prueba4.question3();
-                await pause(2000);
-                await client.sendMessage(msg.from, list);
-                break
-            case 'Pregunta 3':
-                response = msg._data.listResponse.description;
-                writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 3', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
-                console.log("respuesta 3: ", response);
-                await pause(2000);
+    try {
+        //#region code
+        if (msg._data.quotedMsg.list.title === chatbot_Prueba4.title) {
+            const question = msg._data.quotedMsg.list.description.split(',')[0];
+            let list = null;
+            let response = null;
+            const { _data, from, to, deviceType, ack, hasMedia, type } = msg;
+            // console.log({ title_list: msg._data.quotedMsg.list.title, title_description: msg._data.quotedMsg.list.description });
+            // console.log({ title_response: msg._data.listResponse.title, title_description: msg._data.listResponse.description });
+            switch (question) {
+                case 'Pregunta 1':
+                    response = removeEmojis(msg._data.listResponse.title);
+                    writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 1', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
+                    console.log("respuesta 1: ", response);
+                    list = chatbot_Prueba4.question2();
+                    await pause(2000);
+                    await client.sendMessage(msg.from, list);
+                    break;
+                case 'Pregunta 2':
+                    response = msg._data.listResponse.description;
+                    writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 2', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
+                    console.log("respuesta 2: ", response);
+                    list = chatbot_Prueba4.question3();
+                    await pause(2000);
+                    await client.sendMessage(msg.from, list);
+                    break
+                case 'Pregunta 3':
+                    response = msg._data.listResponse.description;
+                    writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 3', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
+                    console.log("respuesta 3: ", response);
+                    list = chatbot_Prueba4.question4();
+                    await pause(2000);
+                    await client.sendMessage(msg.from, list);
+                    break
+                case 'Pregunta 4':
+                    response = msg._data.listResponse.description;
+                    writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 4', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
+                    console.log("respuesta 3: ", response);
+                    await pause(2000);
 
-                // buscar respuestas y dar puntuación.
-                const responses = JSON.parse(fs.readFileSync(path.join('storage_messages', "storagePoll.json"), "utf-8"));
-                const rs = responses.filter(item => item.poll === chatbot_Prueba4.title && item.desde === from.replace('@c.us', ''))
+                    // buscar respuestas y dar puntuación.
+                    const responses = JSON.parse(fs.readFileSync(path.join('storage_messages', "storagePoll.json"), "utf-8"));
+                    const rs = responses.filter(item => item.poll === chatbot_Prueba4.title && item.desde === from.replace('@c.us', ''))
 
-                const firstres1 = rs.find(item => item.question === 'Pregunta 1');
-                const firstres2 = rs.find(item => item.question === 'Pregunta 2');
-                const firstres3 = rs.find(item => item.question === 'Pregunta 3');
+                    const firstres1 = rs.find(item => item.question === 'Pregunta 1');
+                    const firstres2 = rs.find(item => item.question === 'Pregunta 2');
+                    const firstres3 = rs.find(item => item.question === 'Pregunta 3');
+                    const firstres4 = rs.find(item => item.question === 'Pregunta 4');
 
-                const res1 = (firstres1.response !== chatbot_Prueba4.responses['Pregunta 1']) ? 0 : 33.333;
-                const res2 = (firstres2.response !== chatbot_Prueba4.responses['Pregunta 2']) ? 0 : 33.333;
-                const res3 = (firstres3.response !== chatbot_Prueba4.responses['Pregunta 3']) ? 0 : 33.333
+                    const res1 = (firstres1.response !== chatbot_Prueba4.responses['Pregunta 1']) ? 0 : 25;
+                    const res2 = (firstres2.response !== chatbot_Prueba4.responses['Pregunta 2']) ? 0 : 25;
+                    const res3 = (firstres3.response !== chatbot_Prueba4.responses['Pregunta 3']) ? 0 : 25;
+                    const res4 = (firstres4.response !== chatbot_Prueba4.responses['Pregunta 4']) ? 0 : 25;
 
-                const puntuacion = Math.ceil((res1 + res2 + res3));
+                    const puntuacion = Math.ceil((res1 + res2 + res3 + res4));
 
-                console.log(res1, res2, res3, "puntuación", puntuacion);
-                let message = '';
+                    console.log(res1, res2, res3, res4, "puntuación", puntuacion);
+                    let message = '';
 
-                if (puntuacion <= 33.333) message = 'Solo tuviste una respuesta buena. Te recomendamos que repases los ingredientes del burner stack';
-                if (puntuacion <= 66, 666) message = 'Solo tuviste dos respuestas buenas. Casi logras la puntuación perfecta.';
-                if (puntuacion == 100) message = 'Puntuación Perfecta. ¡Felicitaciones!';
-                await client.sendMessage(msg.from, `Perfecto *${msg._data.notifyName}*. Tu puntuación es *${puntuacion}* puntos. \n${message}`);
-                break
-            default:
-                break;
+                    if (puntuacion <= 33.333) message = 'Solo tuviste una respuesta buena. Te recomendamos que repases los ingredientes del burner stack';
+                    if (puntuacion <= 50) message = 'Solo tuviste dos respuestas buenas. Casi logras la puntuación perfecta.';
+                    if (puntuacion <= 74) message = 'Solo tuviste una respuestas mala. Casi logras la puntuación perfecta.';
+                    if (puntuacion == 100) message = 'Puntuación Perfecta. ¡Felicitaciones!';
+                    await client.sendMessage(msg.from, `Perfecto *${msg._data.notifyName}*. Tu puntuación es *${puntuacion}* puntos. \n${message}`);
+                    break
+                default:
+                    break;
+            }
         }
+
+        //#endregion
+    } catch (error) {
+        console.log(error.message);
     }
 }
 
