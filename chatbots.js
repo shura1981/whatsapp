@@ -253,8 +253,8 @@ const chatbot_Prueba2 = (msg) => {
     }
 }
 const chatbot_Prueba4 = {
-    title: 'Prueba de conocimiento',
-    question1: () => {
+    title: `¿Quieres hacer una prueba de conocimiento?`,
+    question1: (name) => {
         let sections = [
             {
                 title: 'Selecciona la respuesta correcta.',
@@ -266,7 +266,7 @@ const chatbot_Prueba4 = {
                 ]
             }
         ];
-        return new List('Pregunta 1, ¿Cuáles son los aminoácidos de cadena remificada? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, chatbot_Prueba4.title, 'nutramerican.com');
+        return new List('Pregunta 1, ¿Cuáles son los aminoácidos de cadena remificada? Presiona en Responder para ver las opciones de respuesta', 'Responder', sections, `Hola *${name}* ` + chatbot_Prueba4.title, 'nutramerican.com');
     },
     question2: () => {
         let sections = [
@@ -301,8 +301,8 @@ const chatbot_Prueba4 = {
                 title: 'Selecciona la respuesta correcta.',
                 rows: [
                     { title: '1️⃣', description: 'Si. Todos lo pueden tomar' },
-                    { title: '2️⃣', description: 'No. Solo clientes tengan problemas con el sistema nervioso' },
-                    { title: '3️⃣', description: 'No. Solo clientes tengan problemas con el azúcar' }
+                    { title: '2️⃣', description: 'No. Los clientes que tengan problemas con el sistema nervioso no lo pueden tomar' },
+                    { title: '3️⃣', description: 'No. Los clientes que tengan problemas con el azúcar no lo pueden tomar' }
                 ]
             }
         ];
@@ -344,7 +344,11 @@ const chatbot_Prueba5 = async (msg, client) => {
 const dialogFlow_bot4 = async (msg, client) => {
     try {
         //#region code
-        if (msg._data.quotedMsg.list.title === chatbot_Prueba4.title) {
+        const title_list= msg._data.quotedMsg.list.title.toLocaleLowerCase();
+        const result= chatbot_Prueba4.title.toLocaleLowerCase();
+        console.log({ title_list, result , title_chat: chatbot_Prueba4.title, check: title_list.includes( 'prueba de conocimiento') });
+
+        if (title_list.includes( 'prueba de conocimiento') ) {
             const question = msg._data.quotedMsg.list.description.split(',')[0];
             let list = null;
             let response = null;
@@ -379,7 +383,7 @@ const dialogFlow_bot4 = async (msg, client) => {
                 case 'Pregunta 4':
                     response = msg._data.listResponse.description;
                     writeMessagesPoll({ poll: chatbot_Prueba4.title, question: 'Pregunta 4', response, desde: from.replace('@c.us', ''), para: to.replace('@c.us', ''), name: _data.notifyName, estado: ack, dispositivo: deviceType, multimedia: hasMedia, fecha: getDate(), hora: getTime(), type })
-                    console.log("respuesta 3: ", response);
+                    console.log("respuesta 4: ", response);
                     await pause(2000);
 
                     // buscar respuestas y dar puntuación.
@@ -401,10 +405,10 @@ const dialogFlow_bot4 = async (msg, client) => {
                     console.log(res1, res2, res3, res4, "puntuación", puntuacion);
                     let message = '';
 
-                    if (puntuacion <= 33.333) message = 'Solo tuviste una respuesta buena. Te recomendamos que repases los ingredientes del burner stack';
-                    if (puntuacion <= 50) message = 'Solo tuviste dos respuestas buenas. Casi logras la puntuación perfecta.';
-                    if (puntuacion <= 74) message = 'Solo tuviste una respuestas mala. Casi logras la puntuación perfecta.';
-                    if (puntuacion == 100) message = 'Puntuación Perfecta. ¡Felicitaciones!';
+                    if (puntuacion <= 25) message = 'Solo tuviste una respuesta buena. Que mal 😔';
+                    if (puntuacion >25 && puntuacion <= 50) message = 'Solo tuviste dos respuestas buenas. Casi logras la puntuación perfecta.😐';
+                    if (puntuacion>50 && puntuacion <= 75) message = 'Solo tuviste una respuestas mala. Casi logras la puntuación perfecta. 👊';
+                    if (puntuacion == 100) message = 'Puntuación Perfecta. ¡Felicitaciones! 🤩🤩🤩 😘';
                     await client.sendMessage(msg.from, `Perfecto *${msg._data.notifyName}*. Tu puntuación es *${puntuacion}* puntos. \n${message}`);
                     break
                 default:

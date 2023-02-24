@@ -68,8 +68,8 @@ module.exports = (client) => {
 
     router.get('/encuesta3', async (req, res) => {
         try {
-            const { to } = req.query;
-            const list = chatbot_Prueba4.question1();
+            const { to, name } = req.query;
+            const list = chatbot_Prueba4.question1(name);
             const number = `${to}@c.us`;
             const resWs = await client.sendMessage(number, list);
             res.status(200).send({ msg: `envidado a ${to}`, payload: resWs });
