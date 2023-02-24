@@ -312,7 +312,7 @@ const chatbot_Prueba4 = {
         'Pregunta 1': 'Leucina, isoleucina y valina',
         'Pregunta 2': 'Metionina, arginina y glicina',
         'Pregunta 3': 'Después del entreno',
-        'Pregunta 4': 'No. Solo clientes tengan problemas con el sistema nervioso',
+        'Pregunta 4': 'No. Los clientes que tengan problemas con el sistema nervioso no lo pueden tomar',
     }
 }
 const chatbot_Prueba5 = async (msg, client) => {
