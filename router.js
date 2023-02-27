@@ -29,7 +29,7 @@ module.exports = (client) => {
     //     }
     // })
     // encuentas
-    router.get('/encuesta1', async (req, res) => {
+    router.get('/encuestamensajeros', async (req, res) => {
         const { to, mensajero, cliente } = req.query;
         try {
             optionsResponse++;
@@ -52,7 +52,7 @@ module.exports = (client) => {
         }
     })
 
-    router.get('/encuesta2', async (req, res) => {
+    router.get('/encuestaramburo', async (req, res) => {
         const { to } = req.query;
         try {
             let sections = [{ title: 'Quiz de Steven', rows: [{ title: '🐷', description: 'Marrano' }, { title: '🐖', description: 'Gordito' }, { title: '🐽', description: 'Porcino' }] }];
@@ -66,7 +66,7 @@ module.exports = (client) => {
     })
 
 
-    router.get('/encuesta3', async (req, res) => {
+    router.get('/encuestasuplementos', async (req, res) => {
         try {
             const { to, name } = req.query;
             const list = chatbot_Prueba4.question1(name);
