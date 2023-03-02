@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { chatbot_Prueba4 } = require("./chatbots");
 const { List, Buttons, MessageMedia } = require('whatsapp-web.js');
-const { getName, pause } = require("./utils.js");
+const { getName, pause, addSendPoll, getListSendPoll, getDate } = require("./utils.js");
+const SendPoll = require('./model/SendPoll')
 const fs = require('fs');
 let optionsResponse = 0;
 
@@ -32,21 +33,28 @@ module.exports = (client) => {
     router.get('/encuestamensajeros', async (req, res) => {
         const { to, mensajero, cliente } = req.query;
         try {
-            optionsResponse++;
-            if (optionsResponse > 1) optionsResponse = 0;
-            const number = `${to}@c.us`;
-            let poll = null;
-            if (optionsResponse === 0) {
-                let sections = [{ title: '', rows: [{ title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
-                poll = new List(`¿Cómo estuvo la entrega de nuestro especialista en logística *${mensajero}*?\n 😐 😃 🤩`, 'Calificar', sections, ``, 'nutramerican.com');
-                await client.sendMessage(number, `Buen día *${getName(cliente)}*. Te escribimos del call center de *MEGAPLEX*. Nos interesa su opinión sobre nuestro servicio de mensajería. \n¿Te gustaría calificar el servicio?`);
+            const list = SendPoll.FromArray(getListSendPoll());
+            if (list.filter(item => item.celular == to && item.fecha == getDate()).length < 1) {
+                optionsResponse++;
+                if (optionsResponse > 1) optionsResponse = 0;
+                const number = `${to}@c.us`;
+                let poll = null;
+                if (optionsResponse === 0) {
+                    let sections = [{ title: '', rows: [{ title: '😐', description: 'Regular' }, { title: '😃', description: 'Bueno' }, { title: '🤩', description: 'Excelente' }] }];
+                    poll = new List(`¿Cómo estuvo la entrega de nuestro especialista en logística *${mensajero}*?\n 😐 😃 🤩`, 'Calificar', sections, ``, 'nutramerican.com');
+                    await client.sendMessage(number, `Buen día *${getName(cliente)}*. Te escribimos del call center de *MEGAPLEX*. Nos interesa su opinión sobre nuestro servicio de mensajería. \n¿Te gustaría calificar el servicio?`);
+                } else {
+                    poll = new Buttons(`\n¿Qué tal estuvo la entrega de nuestro especialista en logística *${mensajero}*?`, [{ body: '😐 Regular' }, { body: '😃 Bueno' }, { body: '🤩 Excelente' }], `¿Te gustaría Calificar la atención al cliente?\n 😐 😃 🤩`, 'nutramerican pharma');
+                    await client.sendMessage(number, `Hola *${getName(cliente)}*. Te escribimos de *MEGAPLEX*. Estamos interesados en mejorar nuestro servicio.`);
+                }
+                await pause(1000);
+                const resWs = await client.sendMessage(number, poll);
+                addSendPoll({ celular: to, mensajero, cliente });
+                res.status(200).send(resWs);
             } else {
-                poll = new Buttons(`\n¿Qué tal estuvo la entrega de nuestro especialista en logística *${mensajero}*?`, [{ body: '😐 Regular' }, { body: '😃 Bueno' }, { body: '🤩 Excelente' }], `¿Te gustaría Calificar la atención al cliente?\n 😐 😃 🤩`, 'nutramerican pharma');
-                await client.sendMessage(number, `Hola *${getName(cliente)}*. Te escribimos de *MEGAPLEX*. Estamos interesados en mejorar nuestro servicio.`);
+                res.status(200).send({ msg: 'mensaje ya enviado', celular: to, cliente, mensajero });
             }
-            await pause(2000);
-            const resWs = await client.sendMessage(number, poll);
-            res.status(200).send(resWs);
+
         } catch (error) {
             res.status(500).send({ message: 'ocurrió un error en el servidor', error: error.message });
         }
